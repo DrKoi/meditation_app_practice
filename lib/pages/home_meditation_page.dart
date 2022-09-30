@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:meditation_app/constants.dart';
 import '../models/item_model.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:bordered_text/bordered_text.dart';
 
 class HomeMeditationPage extends StatefulWidget {
   const HomeMeditationPage({Key? key}) : super(key: key);
@@ -15,23 +17,23 @@ class _HomeMeditationPageState extends State<HomeMeditationPage> {
 
   List<Item> items = [
     Item(
-        name: 'Forest Sounds',
+        name: 'Sonidos del Bosque',
         imagePath: 'meditation_images/forest.jpeg',
         audioPath: 'meditation_audios/forest.mp3'),
     Item(
-        name: 'Night Sounds',
+        name: 'Noche profunda',
         imagePath: 'meditation_images/night.jpeg',
         audioPath: 'meditation_audios/night.mp3'),
     Item(
-        name: 'Ocean Breeze',
+        name: 'Brisa Oceánica',
         imagePath: 'meditation_images/ocean.jpeg',
         audioPath: 'meditation_audios/ocean.mp3'),
     Item(
-        name: 'Waterfall ',
+        name: 'Cascada',
         imagePath: 'meditation_images/waterfall.jpeg',
         audioPath: 'meditation_audios/waterfall.mp3'),
     Item(
-        name: 'Windy Evening',
+        name: 'Tarde de viento',
         imagePath: 'meditation_images/wind.jpeg',
         audioPath: 'meditation_audios/wind.mp3')
   ];
@@ -58,15 +60,22 @@ class _HomeMeditationPageState extends State<HomeMeditationPage> {
                           fit: BoxFit.cover,
                           image: AssetImage(items[index].imagePath))),
                   child: ListTile(
-                    leading: Text(
-                      items[index].name,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    leading: BorderedText(
+                      strokeWidth: 4,
+                      strokeColor: Colors.black,
+                      child: Text(
+                        items[index].name,
+                        style: kGoogleTxtCaption,
+                      ),
                     ),
                     trailing: IconButton(
                       icon: _sonandoIndice == index
-                          ? Icon(MdiIcons.stop)
-                          : Icon(MdiIcons.play),
-                      onPressed: () {
+                          ? Icon(
+                              MdiIcons.stopCircleOutline,
+                              size: 40,
+                            )
+                          : Icon(MdiIcons.playCircleOutline, size: 40),
+                      onPressed: () async {
                         if (_sonandoIndice == index) {
                           setState(() {
                             _sonandoIndice = null;
@@ -74,12 +83,16 @@ class _HomeMeditationPageState extends State<HomeMeditationPage> {
 
                           audioPlayer.stop();
                         } else {
-                          audioPlayer.setAsset(items[index].audioPath);
-                          audioPlayer.setLoopMode(LoopMode.one);
-                          audioPlayer.play();
-                          setState(() {
-                            _sonandoIndice = index;
-                          });
+                          try {
+                            await audioPlayer.setAsset(items[index].audioPath);
+                            audioPlayer.setLoopMode(LoopMode.one);
+                            audioPlayer.play();
+                            setState(() {
+                              _sonandoIndice = index;
+                            });
+                          } catch (error) {
+                            print(error);
+                          }
                         }
                       },
                     ),
